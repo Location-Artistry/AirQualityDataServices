@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+<title>COVID CASES WORLD MAP</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      .theme .esri-legend {
+        z-index: 10;
+        position: "bottom";
+        padding-top: 100px;
+        scale: (.5);
+        line-height: 1px;
+        item-size: 
+        height: 100%;
+        width: 200px;
+        background-color: transparent;
+        color: #f8f8f8;
+        
+      }
+      .header {
+      position: absolute;
+      display: flex;
+      top: 0;
+      width: 100%;
+      height: 55px;
+      z-index: 1;
+      color: #f8f8f8;
+      background: #ab3c16;
+      font-size: 20px;
+    }
+    .title {
+      flex: 1 1;
+      margin: 15px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+
+
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.14/esri/themes/dark/main.css"/>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/layers/GeoJSONLayer",
+        "esri/views/MapView",
+        "esri/layers/TileLayer",
+        "esri/widgets/Legend"
+      ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
+        const worldDataUrl = "https://geojsondataserver.firebaseapp.com/LocationArtistry/CovidGeoJSON/";
+        //const worldDataUrl = "http://localhost:5000/LocationArtistry/CovidGeoJSON/";
+        //const miCountyUrl = "https://opendata.arcgis.com/datasets/67a8ff23b5f54f15b7133b8c30981441_0.geojson";
+        const template = {
+          title: "COUNTRY: {Country}",
+          "content": [{
+            "type": "fields",
+            "fieldInfos": [
+                {
+                "fieldName": "Prov_State",
+                "label": "PROVINCE/STATE:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true, 
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                {
+                "fieldName": "County_Admin",
+                "label": "COUNTY/ADMIN:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true,
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                {
+                "fieldName": "Confirmed",
+                "label": "CONFIRMED:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true,
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                {
+                "fieldName": "Deaths",
+                "label": "DEATHS:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true,
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                {
+                "fieldName": "Recovered",
+                "label": "RECOVERED:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true,
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                {
+                "fieldName": "Updated",
+                "label": "UPDATED:",
+                "isEditable": true,
+                "tooltip": "",
+                "visible": true,
+                "format": null,
+                "stringFieldOption": "text-box"
+                },
+                ]
+            }]
+        }
+        const renderer = {
+          type: "simple",
+          field: "Confirmed",
+          symbol: {
+            type: "picture-marker",
+            url: 'https://static.arcgis.com/images/Symbols/Firefly/FireflyC20.png'
+            //color: [255,0,0,.5],
+            //outline: {
+            //  color: [180,180,180]
+            //}
+          },
+          visualVariables: [
+            {
+              type: "size",
+              field: "Confirmed",
+              stops: [
+                {
+                  value: 1,
+                  size: "1px"
+                },
+                {
+                  value: 50,
+                  size: "5px"
+                },
+                {
+                  value: 100,
+                  size: "10px"
+                },
+                {
+                  value: 1000,
+                  size: "20px"
+                },
+                {
+                  value: 2500,
+                  size: "30px"
+                },
+                {
+                  value: 5000,
+                  size: "40px"
+                },
+                {
+                  value: 10000,
+                  size: "60px"
+                },
+                {
+                  value: 25000,
+                  size: "80px"
+                },
+              ]
+            }
+          ]
+        };
+        //Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude
+        const worldCovidLayer = new GeoJSONLayer({
+          url: worldDataUrl,
+          copyright: "github.com/CSSEGISandData/COVID-19",
+          outFields: ["FIPS", "Country", "Prov_State", "County_Admin", "Confirmed", "Deaths", "Recovered", "Updated"],
+          popupTemplate: template,
+          renderer: renderer //optional
+        });
+        
+        var fireflyLayer = new TileLayer({
+          url: "https://fly.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Firefly/MapServer",
+          id: "firefly",
+          opacity: 0.3
+        });
+
+        const map = new Map({
+          basemap: "streets-night-vector",
+          layers: [fireflyLayer, worldCovidLayer]
+          
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          center: [-97, 39],
+          zoom: 2,
+          map: map
+        });
+
+        var legend = new Legend({
+          view: view,
+          layerInfos: [{
+          layer: worldCovidLayer,
+          title: "Confirmed Cases",
+          }]
+        });
+
+        //view.ui.add(legend, "manual");
+
+    });
+    </script>
+  </head>
+
+  <body class="theme">
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyDFwiC20Qd5iIfCWOrqV-gGfDyz8fxHZg0",
+    authDomain: "purpleairwidget.firebaseapp.com",
+    databaseURL: "https://purpleairwidget.firebaseio.com",
+    projectId: "purpleairwidget",
+    storageBucket: "purpleairwidget.appspot.com",
+    messagingSenderId: "859863967438",
+    appId: "1:859863967438:web:c4f738ef4f069ea2aa129f",
+    measurementId: "G-FW5D49YNLN"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+    <div id="viewDiv"></div>
+  </body>
+</html>

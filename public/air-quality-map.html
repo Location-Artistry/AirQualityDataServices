@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+<title>COVID CASES WORLD MAP</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      .theme .esri-legend {
+        z-index: 10;
+        position: "bottom";
+        padding-top: 100px;
+        scale: (.5);
+        line-height: 1px;
+        height: 100%;
+        width: 200px;
+        background-color: transparent;
+        color: #29c402;
+        
+      }
+      .header {
+      position: absolute;
+      display: flex;
+      top: 0;
+      width: 100%;
+      height: 55px;
+      z-index: 1;
+      color: #f8f8f8;
+      background: #ab3c16;
+      font-size: 20px;
+    }
+    .title {
+      flex: 1 1;
+      margin: 15px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.14/esri/themes/dark/main.css"/>
+    <script src="https://js.arcgis.com/4.14/"></script>
+    <script>
+      require([
+        "esri/Map",
+        "esri/layers/GeoJSONLayer",
+        "esri/views/MapView",
+        "esri/layers/TileLayer",
+        "esri/widgets/Legend"
+      ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
+        //additional stations
+        //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
+        const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
+        //const miCountyUrl = "https://opendata.arcgis.com/datasets/67a8ff23b5f54f15b7133b8c30981441_0.geojson";
+        const template = {
+          title: "COUNTRY: {Country}",
+          "content": [{
+            "type": "fields",
+            "fieldInfos": [
+                {"fieldName":"ID","label":"ID:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"Label","label":"LABEL:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"PM2_5Value","label":"PM2.5 VALUE:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI","label":"AirQualityIndex(AQI):","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQIText","label":"CURRENT AIR STATUS:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI1Hour","label":"1HOUR AQI:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI1HourText","label":"1HOUR AQI STATUS:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI24Hour","label":"24HOUR AQI:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI24HourText","label":"24HOUR AQI STATUS:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"sensorDiff","label":"SENSOR RANGE:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},  
+              ]
+            }]
+        }
+    
+        const renderer = {
+          type: "simple",
+          field: "AQI",
+          symbol: {
+            type: "simple-marker",
+            size: "15"
+          },
+          visualVariables: [
+            {
+              field: "AQI",
+              type:"color",
+              stops: [
+                {value: 0, color: "#29c402"},
+                {value: 50, color: "#ffff30"},
+                {value: 100, color: "#f5b914"},
+                {value: 250, color: "#ff3c19"},
+                {value: 200, color: "#ff0019"},
+                {value: 300, color: "#b30000"},
+                {value: 400, color: "#5c0000"},
+              ]
+            }
+          ]
+        };
+        //[50, 100, 150, 200, 300, 400, 500]
+        const airQualityLayer = new GeoJSONLayer({
+          url: airQualityUrl,
+          copyright: "github.com/CSSEGISandData/COVID-19",
+          outFields: ["ID","Label","PM2_5Value"],
+          popupTemplate: template,
+          renderer: renderer //optional
+        });
+        
+        var fireflyLayer = new TileLayer({
+          url: "https://fly.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Firefly/MapServer",
+          id: "firefly",
+          opacity: 0.3
+        });
+
+        const map = new Map({
+          basemap: "streets-night-vector",
+          layers: [fireflyLayer, airQualityLayer]
+          
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          center: [-97, 39],
+          zoom: 2,
+          map: map
+        });
+
+        var legend = new Legend({
+          view: view,
+          layerInfos: [{
+          layer: airQualityLayer,
+          title: "Air QUalitys",
+          }]
+        });
+
+        //view.ui.add(legend, "manual");
+
+    });
+    </script>
+  </head>
+
+  <body class="theme">
+  <div id="viewDiv"></div>
+  </body>
+</html>

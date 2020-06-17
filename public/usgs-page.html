@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <Set-Cookie: ACookieAvailableCrossSite; SameSite=None;>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      #stJoe {
+        border: 5px solid #600269;
+      }
+    </style>
+
+    <title>PURPLE AIR STATION STATUS</title> 
+  </head>
+  <body>
+    <body style="background-color:#242424;">
+    <script>
+        (async () => {
+            //Live Air Quality Data from project endpoint API: /purpleAirData/station1,station2,...
+            const stationParams = '44439,2822,5712,43297,7772,37659';
+        
+            //fetch purple air quality stations from stationParams List, custom project endpoint
+            const dataSetup = async(stationList) =>{
+                const airQualityFetch = await fetch(`http://localhost:5000/purpleAirData/${stationList}`);
+                const airQualityData = await airQualityFetch.json();
+                return await airQualityData;
+            };
+            //take stationArray from dataSetup and create div for each station showing live attributes
+            const dataDisplay = async(stationArray) => {
+                const headStyle = {'fontSize':'35px','color':'#bb00cc','margin':'4px','lineHeight':'35px'};
+                
+                for (station of stationArray.features){
+                    airObj = station.properties;
+                    const lineList = [{'info':`stationID: ${airObj.ID} PM2.5 CURRENT: ${airObj.PM2_5Value}`},
+                                  {'AQI':`CURRENT AIR QUALITY: ${airObj.AQI} AirQualityIndex(AQI): ${airObj.AQIText}`},
+                                  {'stats':`1 HOUR AIR QUALITY: ${airObj.AQI1Hour} 1 HOUR AQI: ${airObj.AQI1HourText} 24 HOUR AIR QUALITY: ${airObj.AQI24Hour} 24 HOUR AQI: ${airObj.AQI24HourText}`}];
+                    const stationDiv = document.createElement("DIV");
+                    stationDiv.style.textAlign = 'center', stationDiv.style.fontFamily = 'Arial, Helvetica, sans-serif';
+                    stationDiv.style.border = '5px solid #600269';
+                    document.body.appendChild(stationDiv);
+                    const stationHead = document.createElement("H1");
+                    stationHead.innerText = airObj.label;
+                    for(i in headStyle){stationHead.style[i]=headStyle[i]};
+                    stationDiv.appendChild(stationHead)
+                    for(z in lineList){
+                        const lineText = document.createElement("P");
+                        lineText.innerText = (Object.values(lineList[z])[0]), stationDiv.appendChild(lineText);
+                        console.log(Object.values(lineList[z])[0]);
+
+                    }
+                }
+            }
+            const airDataReturn = await dataSetup(stationParams);
+            dataDisplay(await airDataReturn);
+
+
+                
+
+           // { 'type': 'Feature', 'properties': {'ID':ID,'label':Label,'flagged_high':Flag,'version':Version,'WiFiSignal':RSSI,
+           //     'PM2_5Value':PM2_5Value,'sensorDiff':diff_val,'AQI':AQI.aqi_val,'AQIText':AQI.aqi,'AQI1Hour':AQI1Hour.aqi_val,'AQI1HourText':AQI1Hour.aqi,
+           //     'AQI24Hour':AQI24Hour.aqi_val,'AQI24HourText':AQI24Hour.aqi,'AQI1Week':AQI1Week.aqi_val,'AQI1WeekText':AQI1Week.aqi},
+           //     'geometry': { 'type':'Point','coordinates': [Lon,Lat] } };
+
+
+            //setup dictonaries for dynamic CSS styling
+            //const divList = ['threeRivers','burlington','niles'];
+            //onst textList = {'threeRivers':"ST. JOSEPH RIVER \n THREE RIVERS, MI",'burlington':"ST. JOSEPH RIVER \n BURLINGTON, MI",'niles':"ST. JOSEPH RIVER \n NILES, MI"};
+            /*const headStyle = {'fontSize':'35px','color':'#0069cc','margin':'4px','lineHeight':'35px'};
+            const borderStyles = {"p05":'7px solid red', "p10":'7px solid redorange', "p20":'7px solid orange', "p25":'7px solid orange', "p50":'7px solid green', 
+                                  "p75": '7px solid green', "p80":'7px solid blue', "p90":'7px solid darkblue', "p95":'7px solid black'};
+            //const linesList = [{'status':`Current Status:`},{'statusText':`ABOVE NORMAL`},{'flowInfo':`FLOW: 500cfs HEIGHT: 6.2ft`},
+            //                    {'dailyStats':`Daily Mean: 300cfs Min: 139cfs Max: 732cfs`}];   
+            const statusColor = {"p05":'red', "p10":'redorange', "p20":'orange', "p25":'orange', "p50":'green', 
+                                 "p75": 'green', "p80":'blue', "p90":'darkblue', "p95":'black'};
+                                                    
+            for(i in stJoeStations){
+                //console.log(i, stJoeStations[i]);
+                const gageStatus = stJoeData[stJoeStations[i]].stationInfo.gageStatus, siteFlow = stJoeData[stJoeStations[i]].stationInfo.siteFlow;
+                const gageHeight = stJoeData[stJoeStations[i]].stationInfo.gageHeight, dailyMean = stJoeData[stJoeStations[i]].dailyStats.mean;
+                const dailyMin = stJoeData[stJoeStations[i]].dailyStats.minFlow, dailyMax = stJoeData[stJoeStations[i]].dailyStats.maxFlow;
+                const percentStatus = stJoeData[stJoeStations[i]].stationInfo.gagePercent;
+                const linesList = [{'status':`Current Status (siteID:${stJoeStations[i]}):`},{'statusText':`${gageStatus}`},{'flowInfo':`FLOW: ${siteFlow} cfs HEIGHT: ${gageHeight} ft`},
+                                   {'dailyStats':`Daily Mean: ${dailyMean} cfs Min: ${dailyMin} cfs Max: ${dailyMax} cfs`}];
+                const textStyles = {'status': {'color':'#045c72','fontSize':'15px','margin':'0px','lineHeight':'15px'}, 
+                'statusText': {'color':statusColor[percentStatus],'fontSize':'30px','margin':'7px','lineHeight':'32px'},
+                'flowInfo': {'color':'#8fbeff','fontSize':'20px','margin':'0px','lineHeight':'25px'}, 
+                'dailyStats': {'color':'#8fbeff','fontSize':'18px','margin':'2px','lineHeight':'25px'}};  
+                // stjoeData[2].stationInfo.gageStatus
+                const gageDiv = document.createElement("DIV");
+                gageDiv.style.textAlign = 'center', gageDiv.style.fontFamily = 'Arial, Helvetica, sans-serif';
+                gageDiv.style.border = borderStyles[percentStatus];
+                document.body.appendChild(gageDiv);
+                const gageHead = document.createElement("H1");
+                gageHead.innerText = textList[i];
+                for (z in headStyles[i]){
+                    gageHead.style[z] = headStyles[i][z];
+                };
+                gageDiv.appendChild(gageHead);
+                for(x in linesList){
+                    const linesText = document.createElement("P");
+                    const linesKeys = Object.keys(linesList[x])[0], linesValues = Object.values(linesList[x])[0];
+                    for(y in textStyles[linesKeys]){
+                        //console.log(y, textStyles[linesKeys][y]);
+                        linesText.style[y] = textStyles[linesKeys][y];
+                    };                    
+                    linesText.innerText = linesValues, gageDiv.appendChild(linesText);
+                };
+            };
+            */
+        })();
+    </script> 
+  </body>
+</html> 
