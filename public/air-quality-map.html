@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-<title>COVID CASES WORLD MAP</title>
+<title>PURPLE AIR STATIONS NEAR NHBP</title>
 
     <style>
       html,
@@ -61,9 +61,8 @@
         "esri/widgets/Legend"
       ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
         //additional stations
-        //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
-        const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
-        //const miCountyUrl = "https://opendata.arcgis.com/datasets/67a8ff23b5f54f15b7133b8c30981441_0.geojson";
+        const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
+        //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
         const template = {
           title: "COUNTRY: {Country}",
           "content": [{
@@ -88,7 +87,7 @@
           field: "AQI",
           symbol: {
             type: "simple-marker",
-            size: "15"
+            size: "25"
           },
           visualVariables: [
             {
@@ -98,8 +97,8 @@
                 {value: 0, color: "#29c402"},
                 {value: 50, color: "#ffff30"},
                 {value: 100, color: "#f5b914"},
-                {value: 250, color: "#ff3c19"},
-                {value: 200, color: "#ff0019"},
+                {value: 200, color: "#ff3c19"},
+                {value: 250, color: "#ff0019"},
                 {value: 300, color: "#b30000"},
                 {value: 400, color: "#5c0000"},
               ]
@@ -129,8 +128,8 @@
 
         const view = new MapView({
           container: "viewDiv",
-          center: [-97, 39],
-          zoom: 2,
+          center: [-85, 42],
+          zoom: 6,
           map: map
         });
 
@@ -138,11 +137,11 @@
           view: view,
           layerInfos: [{
           layer: airQualityLayer,
-          title: "Air QUalitys",
+          title: "Purple Air Stations",
           }]
         });
 
-        //view.ui.add(legend, "manual");
+        view.ui.add(legend, "manual");
 
     });
     </script>
