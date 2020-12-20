@@ -60,8 +60,9 @@
         "esri/layers/TileLayer",
         "esri/widgets/Legend"
       ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
+        //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
+        const airQualityUrl = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,2822,5712,43297,7772,37659";
         //additional stations
-        const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
         //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
         const template = {
           title: "COUNTRY: {Country}",

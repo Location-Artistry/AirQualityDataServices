@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <Set-Cookie: ACookieAvailableCrossSite; SameSite=None;>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=\, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      #stJoe {
+        border: 5px solid #00c3ff;
+        color: #29c402; color: #ffff30; color: #f5b914; color: #ff0019; color: #b30000; color: #5c0000;
+      }
+    </style>
+
+    <title>MSU ENVIRO WEATHER STATIONS</title> 
+  </head>
+  <body>
+    <body style="background-color:#242424;">
+    <script>
+        (async () => {
+            //Live Air Quality Data from project endpoint API: /purpleAirData/station1,station2,...
+            const stationParams = 'men,cld,cer,alb,kzo,cnt';
+            const statusColor = {'50':'#29c402','100':'#ffff30','200':'#f5b914','250':'#ff0019','300':'#b30000','400':'#5c0000','1000':'#5c0000'};
+            const headStyle = {'fontSize':'15px','color':'darkBlue','lineHeight':'0px','margin':'10px','textShadow':'1px 1px 1px black','paddingTop':'5px'};
+            //fetch purple air quality stations from stationParams List, custom project endpoint
+            const dataSetup = async(stationList) =>{
+                //const dataFetch = await fetch(`http://localhost:5000/msuWeatherData/${stationList}`);
+                const dataFetch = await fetch(`https://purpleairwidget.firebaseapp.com/msuWeatherData/${stationList}`);
+                const returnData = await dataFetch.json();
+                console.log(returnData);
+                return await returnData;
+            };
+            //assigns color based on AQI value to be used in display
+            const getAQIColor = async(AQIVal) => {
+                let airColor;
+                return airColor = AQIVal < 50 ? statusColor[50] : AQIVal < 100 ? statusColor[100] : AQIVal < 200 ? statusColor[200] :
+                       AQIVal < 250 ? statusColor[250] : AQIVal < 300 ? statusColor[300] : AQIVal < 400 ? statusColor[400] : 
+                       statusColor[1000];
+            }
+            //take stationArray from dataSetup and create div for each station showing live attributes
+            const dataDisplay = async(stationArray) => {              
+                for (station of stationArray){
+                    airObj = station.properties;
+                    //const AQIColor = getAQIColor(airObj.AQI);
+                    const lineList = [{'name':`${airObj.stationName}`}, {'temp':`${airObj.airTemp}`},
+                    {'rain':`Rainfall Today = ${airObj.rainfallToday}`}, {'humid':`DewPoint = ${airObj.dewpoint}\xa0 Rel Humid = ${airObj.relHumidity}`},
+                    {'wind':`Wind Dir = ${airObj.windDir} \xa0 Speed = ${airObj.windSpeed}`},
+                    {'coords':`${station.geometry.coordinates[0]}, ${station.geometry.coordinates[1]} `}];
+                    const textStyles = {'temp': {'color': '#00c3ff','fontSize':'45px','margin':'7px','lineHeight':'45px','textShadow':'4px 4px 4px black'},
+                    'name': {'color':'#1e0020','fontSize':'20px','margin':'0px','lineHeight':'20px'},
+                    'rain': {'color':'grey','fontSize':'17px','margin':'0px','lineHeight':'22px','textShadow':'1px 1px 1px black'}, 
+                    'humid': {'color':'grey','fontSize':'13px','margin':'0px','lineHeight':'22x','textShadow':'1px 1px 1px black'}, 
+                    'wind': {'color':'grey','fontSize':'13px','margin':'0px','lineHeight':'22px','textShadow':'1px 1px 1px black'},
+                    'coords': {'color':'dimgray','fontSize':'12px','margin':'0px','lineHeight':'20px','paddingBottom':'15px','textShadow':'1px 1px 1px black'}};
+                    const divStyle = {'textAlign':'center','fontFamily':'sans-serif','border':'4px solid #001229','borderRadius':'50%',
+                                      'background':'#2f5e9b55','padding':'5px','margin':'4px'};
+                    //create and style each div loop through style properties
+                    const stationDiv = document.createElement("DIV");
+                    for(h in divStyle){stationDiv.style[h]=divStyle[h]};                                      
+                    document.body.appendChild(stationDiv);
+                    //create and style each head loop through style properties
+                    const stationHead = document.createElement("P");
+                    stationHead.innerText = airObj.stationID;
+                    for(i in headStyle){stationHead.style[i]=headStyle[i]};
+                    stationDiv.appendChild(stationHead)
+                    for(z in lineList){
+                        const lineText = document.createElement("P");
+                        const lineKeys = Object.keys(lineList[z])[0], lineValues = Object.values(lineList[z])[0];
+                        for (y in textStyles[lineKeys]){
+                            //console.log(y, textStyles[lineKeys][y]);
+                            lineText.style[y] = textStyles[lineKeys][y];
+                        }
+                        lineText.innerText = (Object.values(lineList[z])[0]), stationDiv.appendChild(lineText);
+                    }
+                }
+            }
+            //main page execution function calls
+            const setupReturn = await dataSetup(stationParams);
+            dataDisplay(await setupReturn);
+        })();
+    </script> 
+  </body>
+</html> 
