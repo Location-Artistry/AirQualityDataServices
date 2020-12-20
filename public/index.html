@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!--THIS IS A DUPLICATE OF THE nhbp-sensors.html PAGE-->
   <head>
     <Set-Cookie: ACookieAvailableCrossSite; SameSite=None;>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=\, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <style>
-      #stJoe {
-        border: 5px solid #c999ce;
-        color: #29c402; color: #ffff30; color: #f5b914; color: #ff0019; color: #b30000; color: #5c0000;
-      }
+ 
     </style>
 
     <title>PURPLE AIR STATION STATUS</title> 
@@ -22,7 +20,6 @@
             const stationParams = '44439,2822,5712,43297,7772,37659';
             const statusColor = {'50':'#29c402','100':'#ffff30','200':'#f5b914','250':'#ff0019','300':'#b30000','400':'#5c0000','1000':'#5c0000'};
             const headStyle = {'fontSize':'38px','color':'#882094','margin':'4px','lineHeight':'35px','textShadow':'2px 2px 2px black'};
-
             //fetch purple air quality stations from stationParams List, custom project endpoint
             const dataSetup = async(stationList) =>{
                 //const airQualityFetch = await fetch(`http://localhost:5000/purpleAirData/${stationList}`);

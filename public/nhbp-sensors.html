@@ -6,10 +6,6 @@
     <meta name="viewport" content="width=\, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <style>
-      #stJoe {
-        border: 5px solid #c999ce;
-        color: #29c402; color: #ffff30; color: #f5b914; color: #ff0019; color: #b30000; color: #5c0000;
-      }
     </style>
 
     <title>PURPLE AIR STATION STATUS</title> 
@@ -37,7 +33,6 @@
                        AQIVal < 250 ? statusColor[250] : AQIVal < 300 ? statusColor[300] : AQIVal < 400 ? statusColor[400] : 
                        statusColor[1000];
             }
-
             //take stationArray from dataSetup and create div for each station showing live attributes
             const dataDisplay = async(stationArray) => {              
                 for (station of stationArray.features){
