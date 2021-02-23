@@ -17,9 +17,10 @@
     <script>
         (async () => {
             //Live Air Quality Data from project endpoint API: /purpleAirData/station1,station2,...
-            const stationParams = '44439,2822,5712,43297,7772,37659';
+            // const stationParams = '44439,2822,5712,43297,7772,37659'; Added Hillman 2-22-21
+            const stationParams = '44439,41907,5712,43297,7772,37659';
             const statusColor = {'50':'#29c402','100':'#ffff30','200':'#f5b914','250':'#ff0019','300':'#b30000','400':'#5c0000','1000':'#5c0000'};
-            const headStyle = {'fontSize':'38px','color':'#882094','margin':'4px','lineHeight':'35px','textShadow':'2px 2px 2px black'};
+            const headStyle = {'fontSize':'6vw','color':'#882094','margin':'4px','lineHeight':'35px','textShadow':'2px 2px 2px black'};
             //fetch purple air quality stations from stationParams List, custom project endpoint
             const dataSetup = async(stationList) =>{
                 //const airQualityFetch = await fetch(`http://localhost:5000/purpleAirData/${stationList}`);
@@ -34,7 +35,6 @@
                        AQIVal < 250 ? statusColor[250] : AQIVal < 300 ? statusColor[300] : AQIVal < 400 ? statusColor[400] : 
                        statusColor[1000];
             }
-
             //take stationArray from dataSetup and create div for each station showing live attributes
             const dataDisplay = async(stationArray) => {              
                 for (station of stationArray.features){
@@ -44,12 +44,12 @@
                     {'info':`stationID: ${airObj.ID} PM2.5 CURRENT: ${airObj.PM2_5Value}`},
                     {'stats':`1-Hour AQI: \xa0${airObj.AQI1Hour} ${Array(4).fill('\xa0').join('')} 1-Hour Status: \xa0${airObj.AQI1HourText}`},
                     {'dailyStats':`24-Hour AQI: ${airObj.AQI24Hour} ${Array(4).fill('\xa0').join('')} 24-Hour Status: ${airObj.AQI24HourText}`}];
-                    const textStyles = {'AQI': {'color': await AQIColor,'fontSize':'30px','margin':'7px','lineHeight':'32px','textShadow':'4px 4px 4px black'},
-                    'info': {'color':'#1e0020','fontSize':'20px','margin':'0px','lineHeight':'25px'},
-                    'stats': {'color':'#c999ce','fontSize':'18px','margin':'0px','lineHeight':'20px'}, 
-                    'dailyStats': {'color':'#c999ce','fontSize':'18px','margin':'0px','lineHeight':'20px'}}; 
-                    const divStyle = {'textAlign':'center','fontFamily':'sans-serif','border':'8px solid #3e0044','borderRadius':'25px',
-                                      'background':`${await AQIColor}22`,'padding':'5px','margin':'4px'};
+                    const textStyles = {'AQI': {'color': await AQIColor,'fontSize':'5vw','margin':'7px','lineHeight':'32px','textShadow':'4px 4px 4px black'},
+                    'info': {'color':'#836785','fontSize':'3.5vw','margin':'0px','lineHeight':'25px'},
+                    'stats': {'color':'#c999ce','fontSize':'3vw','margin':'0px','lineHeight':'20px'}, 
+                    'dailyStats': {'color':'#c999ce','fontSize':'3vw','margin':'0px','lineHeight':'20px'}}; 
+                    const divStyle = {'textAlign':'center','fontFamily':'sans-serif','border':'6px solid #3e0044','borderRadius':'25px',
+                                      'background':`${await AQIColor}22`,'padding':'3px','margin':'3px'};
                     //create and style each div loop through style properties
                     const stationDiv = document.createElement("DIV");
                     for(h in divStyle){stationDiv.style[h]=divStyle[h]};                                      
