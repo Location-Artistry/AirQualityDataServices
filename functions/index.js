@@ -19,6 +19,83 @@ const cors = require('cors');
 const app = express();
 app.use(cors({ origin: true }));
 
+class Feature {
+  constructor(id) {
+    this.type = 'Feature';
+    this.properties = {'ID':id,'label':'','info':'','status':'','val':-1,'units':''};
+  }
+  id() {return this.properties.ID}
+  info() {return this.properties}
+  addProp(name,value) {
+    try {
+      this.properties[name] = value;
+      return (`${name}: ${value} added to Feature ID: ${this.id()}`); }
+    catch { (`Could NOT add ${name}: ${value}!`) }
+  }
+  addProps(arr) {
+    try { arr.forEach(d => this.properties[d[0]] = d[1])}
+    catch { return (`Could NOT add ${arr} to ${this.id()}`) }
+  }
+};
+class GeoPoint extends Feature {
+  constructor(id,[lon,lat],props = {}) {
+    super(id);
+    this.properties.EPSG = 4326, this.properties.source = '', this.properties.crs = 'WGS 84';
+    this.geometry = {'type':'Point','coordinates':[lon,lat]};
+    Object.entries(props).forEach(([d,i]) => (this.properties[d] = i));
+  }  
+  geo() {return this.geometry.coordinates}
+  crs() {return [(`EPSG:${this.properties.EPSG}`),this.properties.crs]}
+};
+class FeatureCollection {
+  constructor(meta) {
+    this.type = 'FeatureCollection';
+    this.metadata = meta;
+    this.features = [];
+  }
+  geoType() { try {return this.features[0].geometry.type}
+              catch {return "It doesn't appear their are any features yet..."} }
+  fCount() {return this.features.length};
+  fProps() {try {return this.features[0].properties}
+              catch {return "It doesn't appear their are any features yet..."} }
+  fPush(feature) {
+    try { this.features.push(feature);
+      return `Added Feature Number ${this.fCount()}`; }
+    catch { return "Cannot add ${feature} to Feature Collection"} }
+};
+
+//const locData = [{"Latitude":41.6967,"Longitude":-86.2147,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":7.3,"RawConcentration":7.05,"AQI":30,"Category":1,"SiteName":"South Bend-Shields Dr","AgencyName":"Indiana Dept. of Environmental Management","FullAQSCode":"181410015","IntlAQSCode":"840181410015"},{"Latitude":42.767799,"Longitude":-86.148598,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":4.8,"RawConcentration":3.8,"AQI":20,"Category":1,"SiteName":"HOLLAND","AgencyName":"Michigan Department of Environment, Great Lakes, and Energy","FullAQSCode":"260050003","IntlAQSCode":"840260050003"},{"Latitude":41.656944,"Longitude":-85.96833,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":5.3,"RawConcentration":-999,"AQI":22,"Category":1,"SiteName":"Elkhart-Prairie St.","AgencyName":"Indiana Dept. of Environmental Management","FullAQSCode":"180390008","IntlAQSCode":"840180390008"},{"Latitude":42.984699,"Longitude":-85.671097,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":5.6,"RawConcentration":5.2,"AQI":23,"Category":1,"SiteName":"GRAND RAPIDS","AgencyName":"Michigan Department of Environment, Great Lakes, and Energy","FullAQSCode":"260810020","IntlAQSCode":"840260810020"}];
+app.get("/miAirNow/", async (req, res) => {
+  try {
+    // getData async data fetch function
+    const getData = async () => {
+      const url = 'https://www.airnowapi.org/aq/data/?startDate=2021-02-23T16&endDate=2021-02-23T17&parameters=PM25&BBOX=-86.499991,41.465108,-82.852530,44.892602&dataType=B&format=application/json&verbose=1&nowcastonly=0&includerawconcentrations=1&API_KEY=9F2110A4-9094-4BE9-9858-258D4F6959B2';
+      const data = await fetch(url);
+      const dataJSON = await data.json();
+      return dataJSON;
+      //return locData; //for local testing
+    }
+    const geoData = async (data) => {
+      geo = new FeatureCollection('Air Quality Stations centered in Michigan from AirNow.gov');
+      data.forEach(d => {
+        gp = new GeoPoint(d.SiteName,[d.Longitude,d.Latitude],d);
+        geo.fPush(gp);
+      });
+      return geo;
+    };
+    res
+    .set('Access-Control-Allow-Origin', '*')
+    .status(200)
+    .send(await geoData(await getData()));
+  }
+  catch (err) {
+    console.error('Your AQ airNow.gov data is not happening');
+    res
+    .status(400)
+    .send('Your AQ airNow.gov data is not happening');
+  }
+});
+
 app.get("/purpleAirData/:stationList", async (req, res) => {
   const sta_list = req.params.stationList.split(',');  
   const metaData = "GeoJSON of Purple Air Stations requested by station ID, data from PA API, AQI Index calculated using USEPA methods by NHBP, WGS 84 Coordinate System";

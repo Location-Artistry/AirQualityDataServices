@@ -64,7 +64,10 @@
         const airQualityUrl = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41907,5712,43297,7772,37659";
         const nhbpURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41907";
         const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/5712,43297,7772,37659";
-        //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
+        //const airNowURL = "https://purpleairwidget.firebaseapp.com/miAirNow/";
+        const airNowURL = 'https://purpleairwidget.firebaseapp.com/miAirNow/';
+        //const airNowURL = 'http://localhost:5000/miAirNow/';
+        //const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
         const template = {
           title: "STATION: {Label}",
           "content": [{
@@ -82,7 +85,20 @@
                 {"fieldName":"sensorDiff","label":"SENSOR RANGE:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},  
               ]
             }]
-        }
+        };
+        const template2 = {
+          title: "STATION: {ID}",
+          "content": [{
+            "type": "fields",
+            "fieldInfos": [
+                {"fieldName":"ID","label":"ID:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"Value","label":"PM2.5 VALUE:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AQI","label":"AirQualityIndex(AQI):","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"UTC","label":"Date/Time:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+                {"fieldName":"AgencyName","label":"Agency:","isEditable": true,"tooltip": "","visible": true,"format": null,"stringFieldOption":"text-box"},
+              ]
+            }]
+        };
     
         const renderer = {
           type: "simple",
@@ -107,7 +123,6 @@
             }
           ]
         };
-
         const renderer2 = {
           type: "simple",
           field: "AQI",
@@ -131,32 +146,63 @@
             }
           ]
         };
+        const renderer3 = {
+          type: "simple",
+          field: "AQI",
+          symbol: {
+            type: "simple-marker",
+            style: "square",
+            size: "10"
+          },
+          visualVariables: [
+            {
+              field: "AQI",
+              type:"color",
+              stops: [
+                {value: 0, color: "#29c402"},
+                {value: 50, color: "#ffff30"},
+                {value: 100, color: "#f5b914"},
+                {value: 200, color: "#ff3c19"},
+                {value: 250, color: "#ff0019"},
+                {value: 300, color: "#b30000"},
+                {value: 400, color: "#5c0000"},
+              ]
+            }
+          ]
+        };
         //[50, 100, 150, 200, 300, 400, 500]
         const NHBPsta = new GeoJSONLayer({
           url: nhbpURL,
           copyright: "Source Data from PurpleAir.com - GeoJSON created by NHBP",
           outFields: ["ID","Label","PM2_5Value"],
           popupTemplate: template,
-          renderer: renderer
+          renderer: renderer,
+          opacity: 0.8
         });
-
         const nonNHBP = new GeoJSONLayer({
           url: nonStaURL,
           copyright: "Source Data from PurpleAir.com - GeoJSON created by NHBP",
           outFields: ["ID","Label","PM2_5Value"],
           popupTemplate: template,
-          renderer: renderer2 
+          renderer: renderer2,
+          opacity: 0.8
         });
-        
+        const airNow = new GeoJSONLayer({
+          url: airNowURL,
+          copyright: "AirNow.gov stations - API processing by NHBP",
+          outFields: ["ID","AQI"],
+          popupTemplate: template2,
+          renderer: renderer3,
+          opacity: 0.8
+        });
         const fireflyLayer = new TileLayer({
           url: "https://fly.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Firefly/MapServer",
           id: "firefly",
           opacity: 0.3
         });
-
         const map = new Map({
           basemap: "streets-night-vector",
-          layers: [fireflyLayer, NHBPsta, nonNHBP]
+          layers: [fireflyLayer, airNow, nonNHBP, NHBPsta]
         });
         const view = new MapView({
           container: "viewDiv",
@@ -165,15 +211,14 @@
           map: map
         });
 
-        var legend = new Legend({
+        let legend1 = new Legend({
           view: view,
-          layerInfos: [{
-          layer: NHBPsta,
-          title: "Purple Air Stations",
-          }]
+          layerInfos: [
+            { layer: NHBPsta, title: "NHBP Air Sensors"}, 
+            { layer: nonNHBP, title: "Purple Air Stations"},
+            { layer: airNow, title: "AirNow.gov Stations"}]
         });
-
-        view.ui.add(legend, "manual");
+        view.ui.add(legend1, "manual");
 
     });
     </script>
