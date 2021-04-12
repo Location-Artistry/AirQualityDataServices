@@ -69,7 +69,7 @@ app.get("/miAirNow/", async (req, res) => {
   try {
     // getData async data fetch function
     const getData = async () => {
-      const url = 'https://www.airnowapi.org/aq/data/?startDate=2021-02-23T16&endDate=2021-02-23T17&parameters=PM25&BBOX=-86.499991,41.465108,-82.852530,44.892602&dataType=B&format=application/json&verbose=1&nowcastonly=0&includerawconcentrations=1&API_KEY=9F2110A4-9094-4BE9-9858-258D4F6959B2';
+      const url = 'https://www.airnowapi.org/aq/data/?parameters=PM25&BBOX=-86.499991,41.465108,-82.852530,44.892602&dataType=B&format=application/json&verbose=1&nowcastonly=0&includerawconcentrations=1&API_KEY=9F2110A4-9094-4BE9-9858-258D4F6959B2';
       const data = await fetch(url);
       const dataJSON = await data.json();
       return dataJSON;

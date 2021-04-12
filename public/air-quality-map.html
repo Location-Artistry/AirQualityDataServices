@@ -62,9 +62,8 @@
       ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
         //const airQualityUrl = "http://localhost:5000/purpleAirData/44439,2822,5712,43297,7772,37659";
         const airQualityUrl = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41907,5712,43297,7772,37659";
-        const nhbpURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41907";
-        const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/5712,43297,7772,37659";
-        //const airNowURL = "https://purpleairwidget.firebaseapp.com/miAirNow/";
+        const nhbpURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,42005,41907";
+        const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/5712,43297,7772,37659,33891,58067,96115,1140,93895";
         const airNowURL = 'https://purpleairwidget.firebaseapp.com/miAirNow/';
         //const airNowURL = 'http://localhost:5000/miAirNow/';
         //const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,2822,5712,43297,7772,37659,35927,12607,3118,47281,12296,41619,39617";
@@ -105,7 +104,7 @@
           field: "AQI",
           symbol: {
             type: "simple-marker",
-            size: "30"
+            size: "22"
           },
           visualVariables: [
             {
@@ -128,7 +127,7 @@
           field: "AQI",
           symbol: {
             type: "simple-marker",
-            size: "15"
+            size: "12"
           },
           visualVariables: [
             {
@@ -177,7 +176,7 @@
           outFields: ["ID","Label","PM2_5Value"],
           popupTemplate: template,
           renderer: renderer,
-          opacity: 0.8
+          opacity: 0.7
         });
         const nonNHBP = new GeoJSONLayer({
           url: nonStaURL,
@@ -185,7 +184,7 @@
           outFields: ["ID","Label","PM2_5Value"],
           popupTemplate: template,
           renderer: renderer2,
-          opacity: 0.8
+          opacity: 0.7
         });
         const airNow = new GeoJSONLayer({
           url: airNowURL,
@@ -207,7 +206,7 @@
         const view = new MapView({
           container: "viewDiv",
           center: [-85, 43],
-          zoom: 5,
+          zoom: 6,
           map: map
         });
 
