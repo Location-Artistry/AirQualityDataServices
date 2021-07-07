@@ -17,6 +17,10 @@
       {
         "source": "/miAirNow/**",
         "function": "api"
+      },
+      {
+        "source": "/airData/**",
+        "function": "api"
       }
     ]
   }

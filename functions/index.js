@@ -12,6 +12,7 @@ const firebaseConfig = {
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp(firebaseConfig);
+const db = admin.firestore();
 const puppeteer = require('puppeteer');
 const fetch = require('node-fetch');
 const express = require('express');
@@ -64,6 +65,53 @@ class FeatureCollection {
     catch { return "Cannot add ${feature} to Feature Collection"} }
 };
 
+
+exports.saveData = functions.pubsub.schedule('0 * * * *').onRun(async context => {
+  const saveData = await (await fetch('https://purpleairwidget.firebaseapp.com/airData/')).json();
+  //const saveData = await airData();
+  functions.logger.log(await saveData);
+});
+
+const airData = async () => {
+  //try {
+    const data = await fetch('https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,41907,97713,42005');
+    const dataJSON = await (data).json();
+    console.log('fetch')
+    const dataMap = data.features.map(d => { 
+      d.properties.time = Date.now(), d.properties.date = new Date();
+      r = db.collection('nhbp-pa-data').doc(`${(d.properties.time).toString()}-${(d.properties.ID).toString()}`).set(d.properties);
+      return [`Successfully stored station record: ${d.properties.label} - REC ID - ${d.properties.time}`, d.properties];
+    });
+    return await dataMap;
+  //}
+  //catch (err) {
+  //  console.error('FIRESTORE DB AQ DATA ERROR');
+  //}
+};
+//airData();
+
+// Firestore Test DB function 5-16-2021
+app.get("/airData/", async (req, res) => {
+  try {
+    const data = await (await fetch('https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,41907,97713,42005')).json();
+    const dataMap = data.features.map(d => { 
+      d.properties.time = Date.now(), d.properties.date = new Date();
+      r = db.collection('nhbp-pa-data').doc(`${(d.properties.time).toString()}-${(d.properties.ID).toString()}`).set(d.properties);
+      return [`Successfully stored station record: ${d.properties.label} - REC ID - ${d.properties.time}`, d.properties];
+    });
+    res
+    .set('Access-Control-Allow-Origin', '*')
+    .status(200)
+    .send(dataMap);
+  }
+  catch (err) {
+    console.error('FIRESTORE DB ERROR');
+    res
+    .status(400)
+    .send('FIRESTORE DB ERROR');
+  }
+});
+
 //const locData = [{"Latitude":41.6967,"Longitude":-86.2147,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":7.3,"RawConcentration":7.05,"AQI":30,"Category":1,"SiteName":"South Bend-Shields Dr","AgencyName":"Indiana Dept. of Environmental Management","FullAQSCode":"181410015","IntlAQSCode":"840181410015"},{"Latitude":42.767799,"Longitude":-86.148598,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":4.8,"RawConcentration":3.8,"AQI":20,"Category":1,"SiteName":"HOLLAND","AgencyName":"Michigan Department of Environment, Great Lakes, and Energy","FullAQSCode":"260050003","IntlAQSCode":"840260050003"},{"Latitude":41.656944,"Longitude":-85.96833,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":5.3,"RawConcentration":-999,"AQI":22,"Category":1,"SiteName":"Elkhart-Prairie St.","AgencyName":"Indiana Dept. of Environmental Management","FullAQSCode":"180390008","IntlAQSCode":"840180390008"},{"Latitude":42.984699,"Longitude":-85.671097,"UTC":"2021-02-23T16:00","Parameter":"PM2.5","Unit":"UG/M3","Value":5.6,"RawConcentration":5.2,"AQI":23,"Category":1,"SiteName":"GRAND RAPIDS","AgencyName":"Michigan Department of Environment, Great Lakes, and Energy","FullAQSCode":"260810020","IntlAQSCode":"840260810020"}];
 app.get("/miAirNow/", async (req, res) => {
   try {
@@ -112,7 +160,7 @@ app.get("/purpleAirData/:stationList", async (req, res) => {
     const diff_val = Math.abs(airDataJSON.results[0].PM2_5Value - airDataJSON.results[1].PM2_5Value).toFixed(2);
     //console.log(`${(await currentAQI).aqi_val} ${(await currentAQI).aqi} ${(await oneHourAQI).aqi_val}`);
     airObject = { 'type': 'Feature', 'properties': {'ID':ID,'label':Label,'flagged_high':Flag,'version':Version,'WiFiSignal':RSSI,
-                'PM2_5Value':PM2_5Value,'sensorDiff':diff_val,'AQI':AQI.aqi_val,'AQIText':AQI.aqi,'AQI1Hour':AQI1Hour.aqi_val,'AQI1HourText':AQI1Hour.aqi,
+                'PM2_5Value':PM2_5Value,'PM2_5_1hour':pm25_1hour,'PM2_5_24hour':pm25_24hour,'PM2_5_1week':pm25_1week,'sensorDiff':diff_val,'AQI':AQI.aqi_val,'AQIText':AQI.aqi,'AQI1Hour':AQI1Hour.aqi_val,'AQI1HourText':AQI1Hour.aqi,
                 'AQI24Hour':AQI24Hour.aqi_val,'AQI24HourText':AQI24Hour.aqi,'AQI1Week':AQI1Week.aqi_val,'AQI1WeekText':AQI1Week.aqi},
                 'geometry': { 'type':'Point','coordinates': [Lon,Lat] } };
     return airObject;   
