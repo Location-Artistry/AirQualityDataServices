@@ -62,7 +62,7 @@
       ], function(Map, GeoJSONLayer, MapView, TileLayer, Legend) {
         
         const airQualityUrl = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41907,5712,43297,7772,37659";
-        const nhbpURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,41907,97713,42005";
+        const nhbpURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,42005,41907,97713,97553,97743,97679,91997,97559,95527,92021";
         const nonStaURL = "https://purpleairwidget.firebaseapp.com/purpleAirData/5712,43297,7772,37659,33891,58067,96115,1140,93895";
         const airNowURL = 'https://purpleairwidget.firebaseapp.com/miAirNow/';
         //const nhbpURL = "https://localhost:5000/purpleAirData/44439,41995,41993,41907,97713,42005";
@@ -178,7 +178,7 @@
           outFields: ["ID","Label","PM2_5Value"],
           popupTemplate: template,
           renderer: renderer,
-          opacity: 0.8
+          opacity: 1
         });
         const nonNHBP = new GeoJSONLayer({
           url: nonStaURL,

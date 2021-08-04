@@ -93,7 +93,7 @@ const airData = async () => {
 // Firestore Test DB function 5-16-2021
 app.get("/airData/", async (req, res) => {
   try {
-    const data = await (await fetch('https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,41907,97713,42005')).json();
+    const data = await (await fetch('https://purpleairwidget.firebaseapp.com/purpleAirData/44439,41995,41993,42005,41907,97713,97553,97743,97679,91997,97559,95527,92021')).json();
     const dataMap = data.features.map(d => { 
       d.properties.time = Date.now(), d.properties.date = new Date();
       r = db.collection('nhbp-pa-data').doc(`${(d.properties.time).toString()}-${(d.properties.ID).toString()}`).set(d.properties);
